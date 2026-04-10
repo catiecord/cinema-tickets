@@ -12,7 +12,6 @@ describe('TicketService', () => {
 describe('purchaseTickets - validation', () => {
   it('throws error when account id is less than 1', () => {
     const ticketService = new TicketService();
-
     expect(() => {
       ticketService.purchaseTickets(
         0,
@@ -20,4 +19,11 @@ describe('purchaseTickets - validation', () => {
       );
     }).toThrow(InvalidPurchaseException);
   });
+
+  it('throws error when no ticket requests are provided', () => {
+  const ticketService = new TicketService();
+  expect(() => {
+    ticketService.purchaseTickets(1);
+  }).toThrow(InvalidPurchaseException);
+});
 });
