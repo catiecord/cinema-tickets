@@ -13,5 +13,10 @@ export default class TicketService {
     if (!ticketTypeRequests || ticketTypeRequests.length === 0) {
       throw new InvalidPurchaseException('No ticket requests provided');
     };
+    ticketTypeRequests.forEach((ticketTypeRequest) => {
+      if (ticketTypeRequest.getNoOfTickets() <= 0) {
+        throw new InvalidPurchaseException('Invalid ticket quantity');
+      }
+    });
   }
 }
