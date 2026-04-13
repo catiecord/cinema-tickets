@@ -243,4 +243,28 @@ describe('TicketService', () => {
       expect(seatReservationService.reserveSeat).toHaveBeenCalledWith(1, 1);
     });
   });
+  describe('purchaseTickets - successful interaction', () => {
+    it('calls both payment and seat services with correct values', () => {
+      const paymentService = {
+        makePayment: jest.fn(),
+      };
+
+      const seatReservationService = {
+        reserveSeat: jest.fn(),
+      };
+
+      const ticketService = new TicketService(paymentService, seatReservationService);
+
+      ticketService.purchaseTickets(
+        1,
+        new TicketTypeRequest('ADULT', 2),
+        new TicketTypeRequest('CHILD', 2),
+        new TicketTypeRequest('INFANT', 1),
+      );
+
+      expect(paymentService.makePayment).toHaveBeenCalledWith(1, 80);
+
+      expect(seatReservationService.reserveSeat).toHaveBeenCalledWith(1, 4);
+    });
+  });
 });
