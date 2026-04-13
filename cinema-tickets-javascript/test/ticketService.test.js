@@ -223,5 +223,24 @@ describe('TicketService', () => {
 
       expect(seatReservationService.reserveSeat).toHaveBeenCalledWith(1, 5);
     });
+    it('does not reserve seats for infant tickets', () => {
+      const paymentService = {
+        makePayment: jest.fn(),
+      };
+
+      const seatReservationService = {
+        reserveSeat: jest.fn(),
+      };
+
+      const ticketService = new TicketService(paymentService, seatReservationService);
+
+      ticketService.purchaseTickets(
+        1,
+        new TicketTypeRequest('ADULT', 1),
+        new TicketTypeRequest('INFANT', 1),
+      );
+
+      expect(seatReservationService.reserveSeat).toHaveBeenCalledWith(1, 1);
+    });
   });
 });
