@@ -126,4 +126,24 @@ describe('TicketService', () => {
       expect(seatReservationService.reserveSeat).not.toHaveBeenCalled();
     });
   });
+  describe('purchaseTickets - payments', () => {
+    it('charges £25 for 1 adult ticket', () => {
+      const paymentService = {
+        makePayment: jest.fn(),
+      };
+
+      const seatReservationService = {
+        reserveSeat: jest.fn(),
+      };
+
+      const ticketService = new TicketService(paymentService, seatReservationService);
+
+      ticketService.purchaseTickets(
+        1,
+        new TicketTypeRequest('ADULT', 1),
+      );
+
+      expect(paymentService.makePayment).toHaveBeenCalledWith(1, 25);
+    });
+  });
 });
