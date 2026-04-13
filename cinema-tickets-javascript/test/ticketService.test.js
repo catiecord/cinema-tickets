@@ -204,5 +204,24 @@ describe('TicketService', () => {
 
       expect(seatReservationService.reserveSeat).toHaveBeenCalledWith(1, 1);
     });
-});
+    it('reserves seats for adults and children', () => {
+      const paymentService = {
+        makePayment: jest.fn(),
+      };
+
+      const seatReservationService = {
+        reserveSeat: jest.fn(),
+      };
+
+      const ticketService = new TicketService(paymentService, seatReservationService);
+
+      ticketService.purchaseTickets(
+        1,
+        new TicketTypeRequest('ADULT', 2),
+        new TicketTypeRequest('CHILD', 3),
+      );
+
+      expect(seatReservationService.reserveSeat).toHaveBeenCalledWith(1, 5);
+    });
+  });
 });
