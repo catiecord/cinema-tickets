@@ -41,5 +41,24 @@ describe('TicketService', () => {
         );
       }).toThrow(InvalidPurchaseException);
     });
+    it('throws error when child tickets are purchased without an adult', () => {
+      const ticketService = new TicketService();
+      expect(() => {
+        ticketService.purchaseTickets(
+          1,
+          new TicketTypeRequest('CHILD', 1),
+        );
+      }).toThrow(InvalidPurchaseException);
+    });
+
+    it('throws error when infant tickets are purchased without an adult', () => {
+      const ticketService = new TicketService();
+      expect(() => {
+        ticketService.purchaseTickets(
+          1,
+          new TicketTypeRequest('INFANT', 1),
+        );
+      }).toThrow(InvalidPurchaseException);
+    });
   });
 });

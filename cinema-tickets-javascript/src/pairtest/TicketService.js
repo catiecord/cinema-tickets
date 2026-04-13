@@ -18,5 +18,20 @@ export default class TicketService {
         throw new InvalidPurchaseException('Invalid ticket quantity');
       }
     });
+    let adultCount = 0;
+    let childCount = 0;
+    let infantCount = 0;
+
+    ticketTypeRequests.forEach((request) => {
+      const type = request.getTicketType();
+      const quantity = request.getNoOfTickets();
+
+      if (type === 'ADULT') adultCount += quantity;
+      if (type === 'CHILD') childCount += quantity;
+      if (type === 'INFANT') infantCount += quantity;
+    });
+    if (adultCount === 0 && (childCount > 0 || infantCount > 0)) {
+      throw new InvalidPurchaseException('Child and infant tickets require an adult');
+    }
   }
 }
