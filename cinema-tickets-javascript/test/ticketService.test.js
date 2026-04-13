@@ -1,124 +1,113 @@
-import { describe, it, expect, jest } from '@jest/globals';
-import TicketService from '../src/pairtest/TicketService.js';
-import TicketTypeRequest from '../src/pairtest/lib/TicketTypeRequest.js';
-import InvalidPurchaseException from '../src/pairtest/lib/InvalidPurchaseException.js';
+import { describe, it, expect, jest } from "@jest/globals";
+import TicketService from "../src/pairtest/TicketService.js";
+import TicketTypeRequest from "../src/pairtest/lib/TicketTypeRequest.js";
+import InvalidPurchaseException from "../src/pairtest/lib/InvalidPurchaseException.js";
 
-describe('TicketService', () => {
-  describe('purchaseTickets - validation', () => {
-    it('throws error when account id is less than 1', () => {
+const createTicketService = () => {
+  const paymentService = {
+    makePayment: jest.fn(),
+  };
+
+  const seatReservationService = {
+    reserveSeat: jest.fn(),
+  };
+
+  const ticketService = new TicketService(
+    paymentService,
+    seatReservationService,
+  );
+
+  return { ticketService, paymentService, seatReservationService };
+};
+
+describe("TicketService", () => {
+  describe("purchaseTickets - validation", () => {
+    it("throws error when account id is less than 1", () => {
       const ticketService = new TicketService();
 
       expect(() => {
-        ticketService.purchaseTickets(
-          0,
-          new TicketTypeRequest('ADULT', 1),
-        );
+        ticketService.purchaseTickets(0, new TicketTypeRequest("ADULT", 1));
       }).toThrow(InvalidPurchaseException);
     });
-    it('throws error when no ticket requests are provided', () => {
+    it("throws error when no ticket requests are provided", () => {
       const ticketService = new TicketService();
 
       expect(() => {
         ticketService.purchaseTickets(1);
-        }).toThrow(InvalidPurchaseException);
-    });
-    it('throws error when ticket quantity is zero', () => {
-      const ticketService = new TicketService();
-
-      expect(() => {
-        ticketService.purchaseTickets(
-          1,
-          new TicketTypeRequest('ADULT', 0),
-        );
-      }).toThrow(InvalidPurchaseException);
-  });
-    it('throws error when ticket quantity is negative', () => {
-      const ticketService = new TicketService();
-
-      expect(() => {
-        ticketService.purchaseTickets(
-          1,
-          new TicketTypeRequest('ADULT', -1),
-        );
       }).toThrow(InvalidPurchaseException);
     });
-    it('throws error when child tickets are purchased without an adult', () => {
+    it("throws error when ticket quantity is zero", () => {
+      const ticketService = new TicketService();
+
+      expect(() => {
+        ticketService.purchaseTickets(1, new TicketTypeRequest("ADULT", 0));
+      }).toThrow(InvalidPurchaseException);
+    });
+    it("throws error when ticket quantity is negative", () => {
+      const ticketService = new TicketService();
+
+      expect(() => {
+        ticketService.purchaseTickets(1, new TicketTypeRequest("ADULT", -1));
+      }).toThrow(InvalidPurchaseException);
+    });
+    it("throws error when child tickets are purchased without an adult", () => {
+      const ticketService = new TicketService();
+
+      expect(() => {
+        ticketService.purchaseTickets(1, new TicketTypeRequest("CHILD", 1));
+      }).toThrow(InvalidPurchaseException);
+    });
+    it("throws error when infant tickets are purchased without an adult", () => {
+      const ticketService = new TicketService();
+
+      expect(() => {
+        ticketService.purchaseTickets(1, new TicketTypeRequest("INFANT", 1));
+      }).toThrow(InvalidPurchaseException);
+    });
+    it("throws error when more than 25 tickets are purchased", () => {
+      const ticketService = new TicketService();
+
+      expect(() => {
+        ticketService.purchaseTickets(1, new TicketTypeRequest("ADULT", 26));
+      }).toThrow(InvalidPurchaseException);
+    });
+    it("does not throw error when 25 tickets are purchased", () => {
+      const ticketService = new TicketService();
+
+      expect(() => {
+        ticketService.purchaseTickets(1, new TicketTypeRequest("ADULT", 25));
+      }).not.toThrow();
+    });
+    it("throws error when there are more infants than adults", () => {
       const ticketService = new TicketService();
 
       expect(() => {
         ticketService.purchaseTickets(
           1,
-          new TicketTypeRequest('CHILD', 1),
+          new TicketTypeRequest("ADULT", 1),
+          new TicketTypeRequest("INFANT", 2),
         );
       }).toThrow(InvalidPurchaseException);
     });
-    it('throws error when infant tickets are purchased without an adult', () => {
+    it("does not throw error when infants equal adults", () => {
       const ticketService = new TicketService();
 
       expect(() => {
         ticketService.purchaseTickets(
           1,
-          new TicketTypeRequest('INFANT', 1),
-        );
-      }).toThrow(InvalidPurchaseException);
-    });
-    it('throws error when more than 25 tickets are purchased', () => {
-      const ticketService = new TicketService();
-
-      expect(() => {
-        ticketService.purchaseTickets(
-          1,
-          new TicketTypeRequest('ADULT', 26),
-        );
-      }).toThrow(InvalidPurchaseException);
-    });
-    it('does not throw error when 25 tickets are purchased', () => {
-      const ticketService = new TicketService();
-
-      expect(() => {
-        ticketService.purchaseTickets(
-          1,
-          new TicketTypeRequest('ADULT', 25),
+          new TicketTypeRequest("ADULT", 2),
+          new TicketTypeRequest("INFANT", 2),
         );
       }).not.toThrow();
     });
-    it('throws error when there are more infants than adults', () => {
-      const ticketService = new TicketService();
+    it("does not call payment or seat services when purchase is invalid", () => {
+      const { ticketService, paymentService, seatReservationService } =
+        createTicketService();
 
       expect(() => {
         ticketService.purchaseTickets(
           1,
-          new TicketTypeRequest('ADULT', 1),
-          new TicketTypeRequest('INFANT', 2),
-        );
-      }).toThrow(InvalidPurchaseException);
-    });
-    it('does not throw error when infants equal adults', () => {
-      const ticketService = new TicketService();
-
-      expect(() => {
-        ticketService.purchaseTickets(
-          1,
-          new TicketTypeRequest('ADULT', 2),
-          new TicketTypeRequest('INFANT', 2),
-        );
-      }).not.toThrow();
-    });
-    it('does not call payment or seat services when purchase is invalid', () => {
-      const paymentService = {
-        makePayment: jest.fn(),
-      };
-
-      const seatReservationService = {
-        reserveSeat: jest.fn(),
-      };
-
-      const ticketService = new TicketService(paymentService, seatReservationService);
-
-      expect(() => {
-        ticketService.purchaseTickets(
-          1,
-          new TicketTypeRequest('CHILD', 1), // invalid (no adult)
+          new TicketTypeRequest("CHILD", 1), // invalid (no adult)
         );
       }).toThrow(InvalidPurchaseException);
 
@@ -126,140 +115,79 @@ describe('TicketService', () => {
       expect(seatReservationService.reserveSeat).not.toHaveBeenCalled();
     });
   });
-  describe('purchaseTickets - payments', () => {
-    it('charges £25 for 1 adult ticket', () => {
-      const paymentService = {
-        makePayment: jest.fn(),
-      };
+  describe("purchaseTickets - payment", () => {
+    it("charges £25 for 1 adult ticket", () => {
+      const { ticketService, paymentService } = createTicketService();
 
-      const seatReservationService = {
-        reserveSeat: jest.fn(),
-      };
-
-      const ticketService = new TicketService(paymentService, seatReservationService);
-
-      ticketService.purchaseTickets(
-        1,
-        new TicketTypeRequest('ADULT', 1),
-      );
+      ticketService.purchaseTickets(1, new TicketTypeRequest("ADULT", 1));
 
       expect(paymentService.makePayment).toHaveBeenCalledWith(1, 25);
     });
-    it('charges correct total for adults and children', () => {
-      const paymentService = {
-        makePayment: jest.fn(),
-      };
-
-      const seatReservationService = {
-        reserveSeat: jest.fn(),
-      };
-
-      const ticketService = new TicketService(paymentService, seatReservationService);
+    it("charges correct total for adults and children", () => {
+      const { ticketService, paymentService } = createTicketService();
 
       ticketService.purchaseTickets(
         1,
-        new TicketTypeRequest('ADULT', 2),
-        new TicketTypeRequest('CHILD', 1),
+        new TicketTypeRequest("ADULT", 2),
+        new TicketTypeRequest("CHILD", 1),
       );
 
       expect(paymentService.makePayment).toHaveBeenCalledWith(1, 65);
     });
-    it('does not charge for infant tickets', () => {
-      const paymentService = {
-        makePayment: jest.fn(),
-      };
-
-      const seatReservationService = {
-        reserveSeat: jest.fn(),
-      };
-
-      const ticketService = new TicketService(paymentService, seatReservationService);
+    it("does not charge for infant tickets", () => {
+      const { ticketService, paymentService } = createTicketService();
 
       ticketService.purchaseTickets(
         1,
-        new TicketTypeRequest('ADULT', 2),
-        new TicketTypeRequest('INFANT', 2),
+        new TicketTypeRequest("ADULT", 2),
+        new TicketTypeRequest("INFANT", 2),
       );
 
-      // 2 adults = 50, infants = 0 → total = 50
+      // 2 adults = 50, infants = 0 total = 50
       expect(paymentService.makePayment).toHaveBeenCalledWith(1, 50);
     });
   });
-  describe('purchaseTickets - seat reservation', () => {
-    it('reserves 1 seat for 1 adult ticket', () => {
-      const paymentService = {
-        makePayment: jest.fn(),
-      };
+  describe("purchaseTickets - seat reservation", () => {
+    it("reserves 1 seat for 1 adult ticket", () => {
+      const { ticketService, seatReservationService } = createTicketService();
 
-      const seatReservationService = {
-        reserveSeat: jest.fn(),
-      };
-
-      const ticketService = new TicketService(paymentService, seatReservationService);
-
-      ticketService.purchaseTickets(
-        1,
-        new TicketTypeRequest('ADULT', 1),
-      );
+      ticketService.purchaseTickets(1, new TicketTypeRequest("ADULT", 1));
 
       expect(seatReservationService.reserveSeat).toHaveBeenCalledWith(1, 1);
     });
-    it('reserves seats for adults and children', () => {
-      const paymentService = {
-        makePayment: jest.fn(),
-      };
-
-      const seatReservationService = {
-        reserveSeat: jest.fn(),
-      };
-
-      const ticketService = new TicketService(paymentService, seatReservationService);
+    it("reserves seats for adults and children", () => {
+      const { ticketService, seatReservationService } = createTicketService();
 
       ticketService.purchaseTickets(
         1,
-        new TicketTypeRequest('ADULT', 2),
-        new TicketTypeRequest('CHILD', 3),
+        new TicketTypeRequest("ADULT", 2),
+        new TicketTypeRequest("CHILD", 3),
       );
 
       expect(seatReservationService.reserveSeat).toHaveBeenCalledWith(1, 5);
     });
-    it('does not reserve seats for infant tickets', () => {
-      const paymentService = {
-        makePayment: jest.fn(),
-      };
-
-      const seatReservationService = {
-        reserveSeat: jest.fn(),
-      };
-
-      const ticketService = new TicketService(paymentService, seatReservationService);
+    it("does not reserve seats for infant tickets", () => {
+      const { ticketService, seatReservationService } = createTicketService();
 
       ticketService.purchaseTickets(
         1,
-        new TicketTypeRequest('ADULT', 1),
-        new TicketTypeRequest('INFANT', 1),
+        new TicketTypeRequest("ADULT", 1),
+        new TicketTypeRequest("INFANT", 1),
       );
 
       expect(seatReservationService.reserveSeat).toHaveBeenCalledWith(1, 1);
     });
   });
-  describe('purchaseTickets - successful interaction', () => {
-    it('calls both payment and seat services with correct values', () => {
-      const paymentService = {
-        makePayment: jest.fn(),
-      };
-
-      const seatReservationService = {
-        reserveSeat: jest.fn(),
-      };
-
-      const ticketService = new TicketService(paymentService, seatReservationService);
+  describe("purchaseTickets - service interaction", () => {
+    it("calls both payment and seat services with correct values", () => {
+      const { ticketService, paymentService, seatReservationService } =
+        createTicketService();
 
       ticketService.purchaseTickets(
         1,
-        new TicketTypeRequest('ADULT', 2),
-        new TicketTypeRequest('CHILD', 2),
-        new TicketTypeRequest('INFANT', 1),
+        new TicketTypeRequest("ADULT", 2),
+        new TicketTypeRequest("CHILD", 2),
+        new TicketTypeRequest("INFANT", 1),
       );
 
       expect(paymentService.makePayment).toHaveBeenCalledWith(1, 80);
