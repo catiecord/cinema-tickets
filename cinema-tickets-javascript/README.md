@@ -22,6 +22,7 @@ The solution was developed incrementally using TDD:
 3. Refactor while keeping tests green
 
 The test suite is organised by behaviour:
+
 - validation
 - payment calculation
 - seat reservation
@@ -52,6 +53,7 @@ Supporting logic is extracted into private helper methods to keep the main metho
 External services (`TicketPaymentService` and `SeatReservationService`) are injected via the constructor.
 
 This allows:
+
 - Easy mocking during testing
 - Decoupling from concrete implementations
 - Improved testability
@@ -61,10 +63,12 @@ This allows:
 ### Validation Strategy
 
 Validation is performed early to:
+
 - Prevent invalid data from being processed
 - Avoid unnecessary calls to external systems
 
 Business rules enforced include:
+
 - Valid account ID
 - At least one ticket requested
 - Ticket quantities must be greater than zero
@@ -77,10 +81,10 @@ Business rules enforced include:
 ## Pricing Rules
 
 | Ticket Type | Price |
-|------------|------|
-| INFANT     | £0   |
-| CHILD      | £15  |
-| ADULT      | £25  |
+| ----------- | ----- |
+| INFANT      | £0    |
+| CHILD       | £15   |
+| ADULT       | £25   |
 
 - Infants do not require seats and are not charged
 - Seats are only allocated for adults and children
