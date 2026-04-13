@@ -185,4 +185,24 @@ describe('TicketService', () => {
       expect(paymentService.makePayment).toHaveBeenCalledWith(1, 50);
     });
   });
+  describe('purchaseTickets - seat reservation', () => {
+    it('reserves 1 seat for 1 adult ticket', () => {
+      const paymentService = {
+        makePayment: jest.fn(),
+      };
+
+      const seatReservationService = {
+        reserveSeat: jest.fn(),
+      };
+
+      const ticketService = new TicketService(paymentService, seatReservationService);
+
+      ticketService.purchaseTickets(
+        1,
+        new TicketTypeRequest('ADULT', 1),
+      );
+
+      expect(seatReservationService.reserveSeat).toHaveBeenCalledWith(1, 1);
+    });
+});
 });

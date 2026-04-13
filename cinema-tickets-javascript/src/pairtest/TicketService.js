@@ -57,5 +57,8 @@ export default class TicketService {
     };
     const totalAmount = (adultCount * 25) + (childCount * 15);
     this.ticketPaymentService.makePayment(accountId, totalAmount);
+    
+    const totalSeats = adultCount;
+    this.seatReservationService.reserveSeat(accountId, totalSeats);
   };
 };
