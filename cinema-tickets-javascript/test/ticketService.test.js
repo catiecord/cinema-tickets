@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, jest } from '@jest/globals';
 import TicketService from '../src/pairtest/TicketService.js';
 import TicketTypeRequest from '../src/pairtest/lib/TicketTypeRequest.js';
 import InvalidPurchaseException from '../src/pairtest/lib/InvalidPurchaseException.js';
@@ -103,6 +103,27 @@ describe('TicketService', () => {
           new TicketTypeRequest('INFANT', 2),
         );
       }).not.toThrow();
+    });
+    it('does not call payment or seat services when purchase is invalid', () => {
+      const paymentService = {
+        makePayment: jest.fn(),
+      };
+
+      const seatReservationService = {
+        reserveSeat: jest.fn(),
+      };
+
+      const ticketService = new TicketService(paymentService, seatReservationService);
+
+      expect(() => {
+        ticketService.purchaseTickets(
+          1,
+          new TicketTypeRequest('CHILD', 1), // invalid (no adult)
+        );
+      }).toThrow(InvalidPurchaseException);
+
+      expect(paymentService.makePayment).not.toHaveBeenCalled();
+      expect(seatReservationService.reserveSeat).not.toHaveBeenCalled();
     });
   });
 });
