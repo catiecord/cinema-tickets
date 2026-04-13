@@ -145,5 +145,25 @@ describe('TicketService', () => {
 
       expect(paymentService.makePayment).toHaveBeenCalledWith(1, 25);
     });
+    it('charges correct total for adults and children', () => {
+      const paymentService = {
+        makePayment: jest.fn(),
+      };
+
+      const seatReservationService = {
+        reserveSeat: jest.fn(),
+      };
+
+      const ticketService = new TicketService(paymentService, seatReservationService);
+
+      ticketService.purchaseTickets(
+        1,
+        new TicketTypeRequest('ADULT', 2),
+        new TicketTypeRequest('CHILD', 1),
+      );
+
+      // 2 adults = 50, 1 child = 15 → total = 65
+      expect(paymentService.makePayment).toHaveBeenCalledWith(1, 65);
+    });
   });
 });

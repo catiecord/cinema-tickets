@@ -55,7 +55,7 @@ export default class TicketService {
     if (infantCount > adultCount) {
       throw new InvalidPurchaseException('Infant tickets cannot exceed adult tickets');
     };
-    const totalAmount = adultCount * 25;
+    const totalAmount = (adultCount * 25) + (childCount * 15);
     this.ticketPaymentService.makePayment(accountId, totalAmount);
   };
 };
