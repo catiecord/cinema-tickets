@@ -37,6 +37,9 @@ export default class TicketService {
     if (totalTickets > 25) {
        throw new InvalidPurchaseException('Cannot purchase more than 25 tickets');
       };
-      
+    if (infantCount > adultCount) {
+      throw new InvalidPurchaseException('Infant tickets cannot exceed adult tickets');
+    };
+
   }
 }

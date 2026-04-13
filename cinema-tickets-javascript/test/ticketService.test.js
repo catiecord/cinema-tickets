@@ -54,7 +54,7 @@ describe('TicketService', () => {
     });
     it('throws error when infant tickets are purchased without an adult', () => {
       const ticketService = new TicketService();
-      
+
       expect(() => {
         ticketService.purchaseTickets(
           1,
@@ -79,6 +79,28 @@ describe('TicketService', () => {
         ticketService.purchaseTickets(
           1,
           new TicketTypeRequest('ADULT', 25),
+        );
+      }).not.toThrow();
+    });
+    it('throws error when there are more infants than adults', () => {
+      const ticketService = new TicketService();
+
+      expect(() => {
+        ticketService.purchaseTickets(
+          1,
+          new TicketTypeRequest('ADULT', 1),
+          new TicketTypeRequest('INFANT', 2),
+        );
+      }).toThrow(InvalidPurchaseException);
+    });
+    it('does not throw error when infants equal adults', () => {
+      const ticketService = new TicketService();
+
+      expect(() => {
+        ticketService.purchaseTickets(
+          1,
+          new TicketTypeRequest('ADULT', 2),
+          new TicketTypeRequest('INFANT', 2),
         );
       }).not.toThrow();
     });
