@@ -7,6 +7,7 @@ describe('TicketService', () => {
   describe('purchaseTickets - validation', () => {
     it('throws error when account id is less than 1', () => {
       const ticketService = new TicketService();
+
       expect(() => {
         ticketService.purchaseTickets(
           0,
@@ -14,16 +15,16 @@ describe('TicketService', () => {
         );
       }).toThrow(InvalidPurchaseException);
     });
-
     it('throws error when no ticket requests are provided', () => {
       const ticketService = new TicketService();
+
       expect(() => {
         ticketService.purchaseTickets(1);
         }).toThrow(InvalidPurchaseException);
     });
-
     it('throws error when ticket quantity is zero', () => {
       const ticketService = new TicketService();
+
       expect(() => {
         ticketService.purchaseTickets(
           1,
@@ -31,9 +32,9 @@ describe('TicketService', () => {
         );
       }).toThrow(InvalidPurchaseException);
   });
-
     it('throws error when ticket quantity is negative', () => {
       const ticketService = new TicketService();
+
       expect(() => {
         ticketService.purchaseTickets(
           1,
@@ -43,6 +44,7 @@ describe('TicketService', () => {
     });
     it('throws error when child tickets are purchased without an adult', () => {
       const ticketService = new TicketService();
+
       expect(() => {
         ticketService.purchaseTickets(
           1,
@@ -50,15 +52,35 @@ describe('TicketService', () => {
         );
       }).toThrow(InvalidPurchaseException);
     });
-
     it('throws error when infant tickets are purchased without an adult', () => {
       const ticketService = new TicketService();
+      
       expect(() => {
         ticketService.purchaseTickets(
           1,
           new TicketTypeRequest('INFANT', 1),
         );
       }).toThrow(InvalidPurchaseException);
+    });
+    it('throws error when more than 25 tickets are purchased', () => {
+      const ticketService = new TicketService();
+
+      expect(() => {
+        ticketService.purchaseTickets(
+          1,
+          new TicketTypeRequest('ADULT', 26),
+        );
+      }).toThrow(InvalidPurchaseException);
+    });
+    it('does not throw error when 25 tickets are purchased', () => {
+      const ticketService = new TicketService();
+
+      expect(() => {
+        ticketService.purchaseTickets(
+          1,
+          new TicketTypeRequest('ADULT', 25),
+        );
+      }).not.toThrow();
     });
   });
 });

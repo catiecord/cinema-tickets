@@ -32,6 +32,11 @@ export default class TicketService {
     });
     if (adultCount === 0 && (childCount > 0 || infantCount > 0)) {
       throw new InvalidPurchaseException('Child and infant tickets require an adult');
-    }
+    };
+    const totalTickets = adultCount + childCount + infantCount;
+    if (totalTickets > 25) {
+       throw new InvalidPurchaseException('Cannot purchase more than 25 tickets');
+      };
+      
   }
 }
