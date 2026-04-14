@@ -2,6 +2,14 @@ import TicketPaymentService from "../thirdparty/paymentgateway/TicketPaymentServ
 import SeatReservationService from "../thirdparty/seatbooking/SeatReservationService.js";
 import InvalidPurchaseException from "./lib/InvalidPurchaseException.js";
 
+const TICKET_PRICE = {
+  ADULT: 25,
+  CHILD: 15,
+  INFANT: 0,
+};
+
+const MAX_TICKETS = 25;
+
 export default class TicketService {
   /**
    * Should only have private methods other than the one below.
@@ -70,7 +78,7 @@ export default class TicketService {
 
     const totalTickets = adultCount + childCount + infantCount;
 
-    if (totalTickets > 25) {
+    if (totalTickets > MAX_TICKETS) {
       throw new InvalidPurchaseException(
         "Cannot purchase more than 25 tickets",
       );
@@ -84,7 +92,7 @@ export default class TicketService {
   }
 
   #calculateTotalAmount(adultCount, childCount) {
-    return adultCount * 25 + childCount * 15;
+    return adultCount * TICKET_PRICE.ADULT + childCount * TICKET_PRICE.CHILD;
   }
 
   #calculateTotalSeats(adultCount, childCount) {
